@@ -33,6 +33,15 @@ const ABOUT_SECTION_IMAGE: string | null = null;
 /** Vertical scroll (px) past which the back-to-top control is shown. */
 const BACK_TO_TOP_AFTER_PX = 400;
 
+const PALETTE_STORAGE_KEY = "gmg-palette";
+
+type PaletteMode = "heritage" | "brand";
+
+function readStoredPalette(): PaletteMode {
+  if (typeof window === "undefined") return "heritage";
+  return localStorage.getItem(PALETTE_STORAGE_KEY) === "brand" ? "brand" : "heritage";
+}
+
 /**
  * Testimonial decorative rings are absolutely positioned with negative `bottom`, so they extend
  * past the section’s layout box. `getBoundingClientRect()` on `#testimonials` ends above that
@@ -71,13 +80,7 @@ function SocialLogoLinkedIn({ className }: { className?: string }) {
 
 function SignalRingSeal({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        "pointer-events-none select-none text-heritage/25",
-        className,
-      )}
-      aria-hidden
-    >
+    <div className={cn("pointer-events-none select-none", className)} aria-hidden>
       <svg viewBox="0 0 200 200" className="h-full w-full" fill="none">
         <circle cx="100" cy="100" r="96" stroke="currentColor" strokeWidth="0.75" />
         <circle cx="100" cy="100" r="78" stroke="currentColor" strokeWidth="0.5" opacity="0.65" />
@@ -135,7 +138,7 @@ function PrimaryButton({
   );
 }
 
-function AboutSectionVisual() {
+function AboutSectionVisual({ palette }: { palette: PaletteMode }) {
   if (ABOUT_SECTION_IMAGE) {
     return (
       <div className="overflow-hidden rounded-sm border border-stone-200 bg-stone-100 shadow-sm">
@@ -156,14 +159,37 @@ function AboutSectionVisual() {
       role="img"
       aria-label="Brand motif: gold signal rings on a deep neutral field"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_25%,rgba(201,162,39,0.14),transparent_55%)]" />
-      <SignalRingSeal className="absolute -right-[22%] top-1/2 h-[125%] min-h-[16rem] w-[125%] min-w-[16rem] -translate-y-1/2 text-heritage/25" />
+      <div
+        className={
+          palette === "brand"
+            ? "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_25%,rgba(212,175,55,0.18),transparent_55%)]"
+            : "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_25%,rgba(201,162,39,0.14),transparent_55%)]"
+        }
+      />
+      <SignalRingSeal
+        className={cn(
+          "absolute -right-[22%] top-1/2 h-[125%] min-h-[16rem] w-[125%] min-w-[16rem] -translate-y-1/2",
+          palette === "brand" ? "text-lineStrong/55" : "text-heritage/35",
+        )}
+      />
       <div className="relative flex aspect-[4/5] flex-col justify-end gap-2 p-6 sm:aspect-[16/10] sm:max-lg:p-8 lg:aspect-[4/5] lg:p-7">
-        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-heritage-soft/95">Services snapshot</p>
+        <p
+          className={cn(
+            "font-mono text-[10px] uppercase tracking-[0.28em]",
+            palette === "brand" ? "text-heritage" : "text-heritage-soft/95",
+          )}
+        >
+          Services snapshot
+        </p>
         <p className="max-w-[20ch] font-display text-[1.35rem] font-semibold leading-snug tracking-tight text-parchment sm:text-xl">
           Placement, digital, and guidance in one relationship.
         </p>
-        <div className="mt-4 h-px max-w-[4.5rem] bg-gradient-to-r from-heritage to-transparent" />
+        <div
+          className={cn(
+            "mt-4 h-px max-w-[4.5rem] bg-gradient-to-r to-transparent",
+            palette === "brand" ? "from-heritage-muted" : "from-heritage",
+          )}
+        />
       </div>
     </div>
   );
@@ -210,6 +236,7 @@ function ServicesGrouped() {
 type PointerOffset = { x: number; y: number };
 
 export default function App() {
+  const [palette, setPalette] = useState<PaletteMode>(readStoredPalette);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -227,6 +254,15 @@ export default function App() {
   );
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.palette = palette;
+    try {
+      localStorage.setItem(PALETTE_STORAGE_KEY, palette);
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [palette]);
 
   const scrollToTop = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -488,31 +524,62 @@ export default function App() {
           {/* Viewport-based min-height + flex centers copy and absolutely positioned rings on mobile, tablet, and desktop */}
           <div className="relative flex min-h-[min(72svh,28rem)] flex-col justify-center sm:min-h-[min(68svh,32rem)] lg:min-h-[min(62svh,36rem)]">
             <div
-              className="pointer-events-none absolute -right-[41%] top-1/2 z-0 h-[min(100vw,55rem)] w-[min(100vw,55rem)] -translate-y-1/2 select-none opacity-[0.25] sm:-right-[26%] sm:h-[min(220vw,60rem)] sm:w-[min(220vw,60rem)] lg:-right-[10%] lg:h-[min(130vw,70rem)] lg:w-[min(130vw,70rem)]"
+              className={cn(
+                "pointer-events-none absolute -right-[41%] top-1/2 z-0 h-[min(100vw,55rem)] w-[min(100vw,55rem)] -translate-y-1/2 select-none sm:-right-[26%] sm:h-[min(220vw,60rem)] sm:w-[min(220vw,60rem)] lg:-right-[10%] lg:h-[min(130vw,70rem)] lg:w-[min(130vw,70rem)]",
+                /* Classic: original gold rings + slightly higher group opacity so they stay visible on parchment. */
+                palette === "brand" ? "opacity-100" : "opacity-[0.32]",
+              )}
               aria-hidden
             >
-              {/* Logo-like: wide span to ring 2, tight step to ring 3; inner pair larger (evokes dark band). Three solid distinct tones. */}
-              <div
-                className="absolute inset-0 rounded-full border-2 border-heritage-muted will-change-transform"
-                style={{
-                  transform: `translate3d(${ringOffset.x * 10}px, ${ringOffset.y * 8}px, 0)`,
-                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                }}
-              />
-              <div
-                className="absolute inset-[16.85%] rounded-full border-2 border-heritage will-change-transform"
-                style={{
-                  transform: `translate3d(${ringOffset.x * 20}px, ${ringOffset.y * 13}px, 0)`,
-                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                }}
-              />
-              <div
-                className="absolute inset-[27.9%] rounded-full border-2 border-heritage-soft will-change-transform"
-                style={{
-                  transform: `translate3d(${ringOffset.x * 30}px, ${ringOffset.y * 20}px, 0)`,
-                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                }}
-              />
+              {palette === "brand" ? (
+                <>
+                  <div
+                    className="absolute inset-0 rounded-full border-2 border-lineStrong/88 will-change-transform"
+                    style={{
+                      transform: `translate3d(${ringOffset.x * 10}px, ${ringOffset.y * 8}px, 0)`,
+                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-[16.85%] rounded-full border-2 border-lineStrong/78 will-change-transform"
+                    style={{
+                      transform: `translate3d(${ringOffset.x * 20}px, ${ringOffset.y * 13}px, 0)`,
+                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-[27.9%] rounded-full border-2 border-lineStrong/66 will-change-transform"
+                    style={{
+                      transform: `translate3d(${ringOffset.x * 30}px, ${ringOffset.y * 20}px, 0)`,
+                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <div
+                    className="absolute inset-0 rounded-full border-2 border-heritage-muted will-change-transform"
+                    style={{
+                      transform: `translate3d(${ringOffset.x * 10}px, ${ringOffset.y * 8}px, 0)`,
+                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-[16.85%] rounded-full border-2 border-heritage will-change-transform"
+                    style={{
+                      transform: `translate3d(${ringOffset.x * 20}px, ${ringOffset.y * 13}px, 0)`,
+                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-[27.9%] rounded-full border-2 border-heritage-soft will-change-transform"
+                    style={{
+                      transform: `translate3d(${ringOffset.x * 30}px, ${ringOffset.y * 20}px, 0)`,
+                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                    }}
+                  />
+                </>
+              )}
             </div>
             <div className="relative z-10 max-w-3xl">
               <h1 className="max-w-[20ch] font-display text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
@@ -552,7 +619,7 @@ export default function App() {
               </div>
             </div>
             <div className="grid gap-10 sm:gap-12 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-10 xl:gap-12">
-              <AboutSectionVisual />
+              <AboutSectionVisual palette={palette} />
               <div className="flex min-h-0 flex-col">
                 <ServicesGrouped />
                 <p className="mt-10 max-w-measure border-t border-stone-200 pt-10 text-base leading-relaxed text-stone-600">
@@ -612,27 +679,55 @@ export default function App() {
             className="pointer-events-none absolute -left-28 bottom-[-4rem] h-80 w-80 select-none sm:h-96 sm:w-96 lg:left-[-6%] lg:bottom-[-18%]"
             aria-hidden
           >
-            <div
-              className="absolute inset-0 rounded-full border border-heritage-muted/50 will-change-transform"
-              style={{
-                transform: `translate3d(${ringOffset.x * 8}px, ${ringOffset.y * 6}px, 0)`,
-                transition: reduceMotion.current ? undefined : "transform 50ms linear",
-              }}
-            />
-            <div
-              className="absolute inset-[16.85%] rounded-full border border-heritage/45 will-change-transform"
-              style={{
-                transform: `translate3d(${ringOffset.x * 16}px, ${ringOffset.y * 11}px, 0)`,
-                transition: reduceMotion.current ? undefined : "transform 50ms linear",
-              }}
-            />
-            <div
-              className="absolute inset-[27.9%] rounded-full border border-heritage-soft/40 will-change-transform"
-              style={{
-                transform: `translate3d(${ringOffset.x * 24}px, ${ringOffset.y * 16}px, 0)`,
-                transition: reduceMotion.current ? undefined : "transform 50ms linear",
-              }}
-            />
+            {palette === "brand" ? (
+              <>
+                <div
+                  className="absolute inset-0 rounded-full border border-lineStrong/82 will-change-transform"
+                  style={{
+                    transform: `translate3d(${ringOffset.x * 8}px, ${ringOffset.y * 6}px, 0)`,
+                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                  }}
+                />
+                <div
+                  className="absolute inset-[16.85%] rounded-full border border-lineStrong/74 will-change-transform"
+                  style={{
+                    transform: `translate3d(${ringOffset.x * 16}px, ${ringOffset.y * 11}px, 0)`,
+                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                  }}
+                />
+                <div
+                  className="absolute inset-[27.9%] rounded-full border border-lineStrong/66 will-change-transform"
+                  style={{
+                    transform: `translate3d(${ringOffset.x * 24}px, ${ringOffset.y * 16}px, 0)`,
+                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <div
+                  className="absolute inset-0 rounded-full border border-heritage-muted/50 will-change-transform"
+                  style={{
+                    transform: `translate3d(${ringOffset.x * 8}px, ${ringOffset.y * 6}px, 0)`,
+                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                  }}
+                />
+                <div
+                  className="absolute inset-[16.85%] rounded-full border border-heritage/45 will-change-transform"
+                  style={{
+                    transform: `translate3d(${ringOffset.x * 16}px, ${ringOffset.y * 11}px, 0)`,
+                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                  }}
+                />
+                <div
+                  className="absolute inset-[27.9%] rounded-full border border-heritage-soft/40 will-change-transform"
+                  style={{
+                    transform: `translate3d(${ringOffset.x * 24}px, ${ringOffset.y * 16}px, 0)`,
+                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                  }}
+                />
+              </>
+            )}
           </div>
           <div className="relative">
             <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
@@ -658,7 +753,12 @@ export default function App() {
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
                 New Conversations. New Platforms. Same Commitment to Story.
               </h2>
-              <div className="mt-8 space-y-6 text-base leading-relaxed text-stone-200">
+              <div
+                className={cn(
+                  "mt-8 space-y-6 text-base leading-relaxed",
+                  palette === "brand" ? "text-parchment/85" : "text-stone-200",
+                )}
+              >
                 <p>
                   We are always exploring new ways to create and share meaningful conversations through long-form
                   storytelling, so we’re starting a podcast!
@@ -673,7 +773,12 @@ export default function App() {
             <div className="flex items-end border border-stone-600 bg-stone-800/40 p-8 sm:p-10">
               <a
                 href={PODCAST_MAILTO}
-                className="inline-flex w-full items-center justify-center border border-heritage bg-heritage px-6 py-3 text-center text-sm font-semibold text-ink transition-colors hover:bg-heritage-soft hover:text-ink"
+                className={cn(
+                  "inline-flex w-full items-center justify-center border px-6 py-3 text-center text-sm font-semibold transition-colors",
+                  palette === "brand"
+                    ? "border-heritage bg-heritage text-ink hover:brightness-110"
+                    : "border-heritage bg-heritage text-ink hover:bg-heritage-soft hover:text-ink",
+                )}
               >
                 Be a Guest
               </a>
@@ -692,7 +797,7 @@ export default function App() {
               </p>
             </div>
             <div className="lg:col-span-7">
-              <div className="border border-stone-200 bg-stone-50 p-8 sm:p-10">
+              <div className="border border-stone-200 bg-panel p-8 sm:p-10">
                 <dl className="space-y-5 text-base text-stone-700">
                   <div>
                     <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-500">Name</dt>
@@ -790,6 +895,22 @@ export default function App() {
                 </a>
               </div>
             </div>
+          </div>
+          <div className="mt-10 border-t border-stone-200 pt-8">
+            <button
+              type="button"
+              onClick={() => setPalette((p) => (p === "heritage" ? "brand" : "heritage"))}
+              className="text-left text-sm font-medium text-stone-600 underline decoration-stone-300 underline-offset-4 transition-colors hover:text-ink"
+              aria-label={
+                palette === "heritage"
+                  ? "Switch to the original yellow and black brand colors"
+                  : "Switch back to the classic site color palette"
+              }
+            >
+              {palette === "heritage"
+                ? "Original brand colors (yellow & black)"
+                : "Classic site palette"}
+            </button>
           </div>
         </SectionShell>
       </footer>

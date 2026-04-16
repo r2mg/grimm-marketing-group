@@ -16,6 +16,13 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap"
       rel="stylesheet"
     />
+    <script>
+      try {
+        if (localStorage.getItem("gmg-palette") === "brand") {
+          document.documentElement.dataset.palette = "brand";
+        }
+      } catch (_) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

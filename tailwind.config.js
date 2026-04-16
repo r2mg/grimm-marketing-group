@@ -5,21 +5,28 @@ export default {
     extend: {
       colors: {
         heritage: {
-          DEFAULT: "#C9A227",
-          muted: "#A88620",
-          soft: "#E8D48A",
+          DEFAULT: "rgb(var(--color-heritage-rgb) / <alpha-value>)",
+          muted: "rgb(var(--color-heritage-muted-rgb) / <alpha-value>)",
+          soft: "rgb(var(--color-heritage-soft-rgb) / <alpha-value>)",
         },
-        ink: "#0c0c0c",
-        parchment: "#FAF7F0",
+        ink: "rgb(var(--color-ink-rgb) / <alpha-value>)",
+        parchment: "rgb(var(--color-parchment-rgb) / <alpha-value>)",
+        /** Section frames & ring motifs (`--line`, `--line-strong` in CSS). */
+        line: "rgb(var(--color-line-rgb) / <alpha-value>)",
+        lineStrong: "rgb(var(--color-line-strong-rgb) / <alpha-value>)",
+        /** Card / inset surfaces (`--bg-panel`). */
+        panel: "rgb(var(--color-panel-rgb) / <alpha-value>)",
         stone: {
-          50: "#F5F1EA",
-          100: "#E8E2D6",
-          200: "#D4CBB8",
-          300: "#B8AB95",
-          400: "#8A7F6C",
-          500: "#5E5648",
-          600: "#454038",
-          700: "#2F2C27",
+          50: "rgb(var(--color-stone-50-rgb) / <alpha-value>)",
+          100: "rgb(var(--color-stone-100-rgb) / <alpha-value>)",
+          200: "rgb(var(--color-stone-200-rgb) / <alpha-value>)",
+          300: "rgb(var(--color-stone-300-rgb) / <alpha-value>)",
+          400: "rgb(var(--color-stone-400-rgb) / <alpha-value>)",
+          500: "rgb(var(--color-stone-500-rgb) / <alpha-value>)",
+          600: "rgb(var(--color-stone-600-rgb) / <alpha-value>)",
+          700: "rgb(var(--color-stone-700-rgb) / <alpha-value>)",
+          800: "rgb(var(--color-stone-800-rgb) / <alpha-value>)",
+          900: "rgb(var(--color-stone-900-rgb) / <alpha-value>)",
         },
       },
       fontFamily: {
