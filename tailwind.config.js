@@ -16,6 +16,12 @@ export default {
         lineStrong: "rgb(var(--color-line-strong-rgb) / <alpha-value>)",
         /** Card / inset surfaces (`--bg-panel`). */
         panel: "rgb(var(--color-panel-rgb) / <alpha-value>)",
+        /** Brass line/detail (#B89A3D in bold theme). */
+        brass: "rgb(var(--color-brass-rgb) / <alpha-value>)",
+        /** Bright accent yellow (#F3C623 in bold theme). */
+        accent: "rgb(var(--color-accent-rgb) / <alpha-value>)",
+        /** Soft charcoal panels (#1A1A1A in bold theme). */
+        charcoal: "rgb(var(--color-charcoal-rgb) / <alpha-value>)",
         stone: {
           50: "rgb(var(--color-stone-50-rgb) / <alpha-value>)",
           100: "rgb(var(--color-stone-100-rgb) / <alpha-value>)",

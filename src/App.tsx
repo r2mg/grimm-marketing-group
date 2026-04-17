@@ -118,18 +118,27 @@ function PrimaryButton({
   href,
   children,
   className,
+  palette = "heritage",
+  ctaVariant = "nav",
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
+  palette?: PaletteMode;
+  /** `hero`: signal yellow fill + ink text (bold theme). `nav`: ink fill + signal yellow text. */
+  ctaVariant?: "nav" | "hero";
 }) {
   return (
     <a
       href={href}
       className={cn(
-        "inline-flex items-center justify-center border border-ink bg-ink px-6 py-3 text-sm font-semibold tracking-wide text-parchment transition-colors duration-200",
-        "hover:border-heritage hover:bg-heritage hover:text-ink",
+        "inline-flex items-center justify-center border px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
+        palette === "brand"
+          ? ctaVariant === "nav"
+            ? "border-ink bg-ink text-accent hover:border-heritage hover:bg-heritage hover:text-ink"
+            : "border-ink bg-heritage text-ink hover:border-heritage-muted hover:bg-heritage-muted hover:text-ink"
+          : "border-ink bg-ink text-parchment hover:border-heritage hover:bg-heritage hover:text-ink",
         className,
       )}
     >
@@ -162,14 +171,14 @@ function AboutSectionVisual({ palette }: { palette: PaletteMode }) {
       <div
         className={
           palette === "brand"
-            ? "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_25%,rgba(212,175,55,0.18),transparent_55%)]"
+            ? "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_25%,rgba(242,195,0,0.2),transparent_55%)]"
             : "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_25%,rgba(201,162,39,0.14),transparent_55%)]"
         }
       />
       <SignalRingSeal
         className={cn(
           "absolute -right-[22%] top-1/2 h-[125%] min-h-[16rem] w-[125%] min-w-[16rem] -translate-y-1/2",
-          palette === "brand" ? "text-lineStrong/55" : "text-heritage/35",
+          palette === "brand" ? "text-brass/60" : "text-heritage/35",
         )}
       />
       <div className="relative flex aspect-[4/5] flex-col justify-end gap-2 p-6 sm:aspect-[16/10] sm:max-lg:p-8 lg:aspect-[4/5] lg:p-7">
@@ -204,7 +213,46 @@ const SERVICE_GROUP_LABELS: {
   { band: "strategy", title: "Strategy" },
 ];
 
-function ServicesGrouped() {
+function ServicesGrouped({ palette }: { palette: PaletteMode }) {
+  if (palette === "brand") {
+    return (
+      <div
+        id="services"
+        className="scroll-mt-24 space-y-9 border-t border-brass/35 pt-9 md:scroll-mt-28 lg:space-y-10 lg:border-0 lg:pt-0"
+      >
+        <div className="rounded-sm border border-brass/45 bg-charcoal px-5 py-6 shadow-xl ring-1 ring-ink/30 sm:px-7 sm:py-8">
+          {SERVICE_GROUP_LABELS.map((group, gi) => {
+            const rows = SERVICES.filter((s) => s.band === group.band);
+            return (
+              <section
+                key={group.band}
+                className={cn(gi > 0 && "mt-8 border-t border-brass/30 pt-8")}
+                aria-labelledby={`svc-${group.band}`}
+              >
+                <h3 id={`svc-${group.band}`} className="flex items-center gap-3">
+                  <span className="h-px w-6 bg-heritage" aria-hidden />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-heritage-muted">
+                    {group.title}
+                  </span>
+                </h3>
+                <ul className="mt-4 space-y-3">
+                  {rows.map((svc) => (
+                    <li key={svc.code} className="flex gap-3 sm:gap-4">
+                      <span className="mt-0.5 shrink-0 font-mono text-[11px] tabular-nums text-heritage">{svc.code}</span>
+                      <span className="font-display text-lg font-medium leading-snug tracking-tight text-parchment">
+                        {svc.label}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       id="services"
@@ -396,7 +444,8 @@ export default function App() {
       <header
         ref={headerRef}
         className={cn(
-          "fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 bg-parchment/95 backdrop-blur supports-[backdrop-filter]:bg-parchment/90",
+          "fixed inset-x-0 top-0 z-50 bg-parchment/95 backdrop-blur supports-[backdrop-filter]:bg-parchment/90",
+          palette === "brand" ? "border-b border-brass/45" : "border-b border-stone-200/80",
           !reduceMotion.current && "transition-transform duration-300 ease-out",
           navHidden && !menuOpen && "-translate-y-full",
         )}
@@ -429,18 +478,21 @@ export default function App() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-stone-600 transition-colors hover:text-ink"
+                className={cn(
+                  "text-sm font-medium transition-colors",
+                  palette === "brand" ? "text-ink hover:text-heritage-muted" : "text-stone-600 hover:text-ink",
+                )}
               >
                 {item.label}
               </a>
             ))}
-            <PrimaryButton href="#contact" className="px-5 py-2.5 text-xs uppercase tracking-wider">
+            <PrimaryButton href="#contact" palette={palette} className="px-5 py-2.5 text-xs uppercase tracking-wider">
               Request a Consultation
             </PrimaryButton>
           </nav>
 
           <div className="flex items-center gap-3 md:hidden">
-            <PrimaryButton href="#contact" className="px-4 py-2 text-xs uppercase tracking-wider">
+            <PrimaryButton href="#contact" palette={palette} className="px-4 py-2 text-xs uppercase tracking-wider">
               Request a Consultation
             </PrimaryButton>
             <button
@@ -490,7 +542,8 @@ export default function App() {
             <div
               id={menuId}
               className={cn(
-                "border-t border-stone-200 bg-parchment",
+                "border-t bg-parchment",
+                palette === "brand" ? "border-brass/35" : "border-stone-200",
                 !menuOpen && "pointer-events-none",
               )}
               aria-hidden={!menuOpen}
@@ -500,7 +553,12 @@ export default function App() {
                   <a
                     key={item.href}
                     href={item.href}
-                    className="border-b border-stone-100 py-3 text-base font-medium text-stone-700 last:border-b-0 hover:text-ink"
+                    className={cn(
+                      "border-b py-3 text-base font-medium last:border-b-0",
+                      palette === "brand"
+                        ? "border-brass/20 text-ink hover:text-heritage-muted"
+                        : "border-stone-100 text-stone-700 hover:text-ink",
+                    )}
                     onClick={closeMenu}
                     tabIndex={menuOpen ? undefined : -1}
                   >
@@ -518,68 +576,40 @@ export default function App() {
         <SectionShell
           id="home"
           as="div"
-          className="relative overflow-hidden border-b border-stone-200 bg-parchment"
+          className={cn(
+            "relative overflow-hidden border-b",
+            palette === "brand" ? "border-brass/45 bg-parchment" : "border-stone-200 bg-parchment",
+          )}
           innerClassName="relative py-20 sm:py-24 lg:py-28"
         >
           {/* Viewport-based min-height + flex centers copy and absolutely positioned rings on mobile, tablet, and desktop */}
           <div className="relative flex min-h-[min(72svh,28rem)] flex-col justify-center sm:min-h-[min(68svh,32rem)] lg:min-h-[min(62svh,36rem)]">
             <div
-              className={cn(
-                "pointer-events-none absolute -right-[41%] top-1/2 z-0 h-[min(100vw,55rem)] w-[min(100vw,55rem)] -translate-y-1/2 select-none sm:-right-[26%] sm:h-[min(220vw,60rem)] sm:w-[min(220vw,60rem)] lg:-right-[10%] lg:h-[min(130vw,70rem)] lg:w-[min(130vw,70rem)]",
-                /* Classic: original gold rings + slightly higher group opacity so they stay visible on parchment. */
-                palette === "brand" ? "opacity-100" : "opacity-[0.32]",
-              )}
+              className="pointer-events-none absolute -right-[41%] top-1/2 z-0 h-[min(100vw,55rem)] w-[min(100vw,55rem)] -translate-y-1/2 select-none opacity-[0.32] sm:-right-[26%] sm:h-[min(220vw,60rem)] sm:w-[min(220vw,60rem)] lg:-right-[10%] lg:h-[min(130vw,70rem)] lg:w-[min(130vw,70rem)]"
               aria-hidden
             >
-              {palette === "brand" ? (
-                <>
-                  <div
-                    className="absolute inset-0 rounded-full border-2 border-lineStrong/88 will-change-transform"
-                    style={{
-                      transform: `translate3d(${ringOffset.x * 10}px, ${ringOffset.y * 8}px, 0)`,
-                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                    }}
-                  />
-                  <div
-                    className="absolute inset-[16.85%] rounded-full border-2 border-lineStrong/78 will-change-transform"
-                    style={{
-                      transform: `translate3d(${ringOffset.x * 20}px, ${ringOffset.y * 13}px, 0)`,
-                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                    }}
-                  />
-                  <div
-                    className="absolute inset-[27.9%] rounded-full border-2 border-lineStrong/66 will-change-transform"
-                    style={{
-                      transform: `translate3d(${ringOffset.x * 30}px, ${ringOffset.y * 20}px, 0)`,
-                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <div
-                    className="absolute inset-0 rounded-full border-2 border-heritage-muted will-change-transform"
-                    style={{
-                      transform: `translate3d(${ringOffset.x * 10}px, ${ringOffset.y * 8}px, 0)`,
-                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                    }}
-                  />
-                  <div
-                    className="absolute inset-[16.85%] rounded-full border-2 border-heritage will-change-transform"
-                    style={{
-                      transform: `translate3d(${ringOffset.x * 20}px, ${ringOffset.y * 13}px, 0)`,
-                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                    }}
-                  />
-                  <div
-                    className="absolute inset-[27.9%] rounded-full border-2 border-heritage-soft will-change-transform"
-                    style={{
-                      transform: `translate3d(${ringOffset.x * 30}px, ${ringOffset.y * 20}px, 0)`,
-                      transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                    }}
-                  />
-                </>
-              )}
+              {/* Same three-ring system for both themes; bold palette comes from CSS variables on `html`. */}
+              <div
+                className="absolute inset-0 rounded-full border-2 border-heritage-muted will-change-transform"
+                style={{
+                  transform: `translate3d(${ringOffset.x * 10}px, ${ringOffset.y * 8}px, 0)`,
+                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                }}
+              />
+              <div
+                className="absolute inset-[16.85%] rounded-full border-2 border-heritage will-change-transform"
+                style={{
+                  transform: `translate3d(${ringOffset.x * 20}px, ${ringOffset.y * 13}px, 0)`,
+                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                }}
+              />
+              <div
+                className="absolute inset-[27.9%] rounded-full border-2 border-heritage-soft will-change-transform"
+                style={{
+                  transform: `translate3d(${ringOffset.x * 30}px, ${ringOffset.y * 20}px, 0)`,
+                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                }}
+              />
             </div>
             <div className="relative z-10 max-w-3xl">
               <h1 className="max-w-[20ch] font-display text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
@@ -594,14 +624,22 @@ export default function App() {
                 on clear communication, practical strategy, and strong client relationships.
               </p>
               <div className="mt-10">
-                <PrimaryButton href="#contact">Request a Consultation</PrimaryButton>
+                <PrimaryButton href="#contact" palette={palette} ctaVariant={palette === "brand" ? "hero" : "nav"}>
+                  Request a Consultation
+                </PrimaryButton>
               </div>
             </div>
           </div>
         </SectionShell>
 
         {/* About + Services — visual column is photo OR brand panel; services are grouped lists (not the former “signal rail”) */}
-        <SectionShell className="border-b border-stone-200 bg-stone-50" innerClassName="py-20 sm:py-24">
+        <SectionShell
+          className={cn(
+            "border-b",
+            palette === "brand" ? "border-brass/40 bg-stone-50" : "border-stone-200 bg-stone-50",
+          )}
+          innerClassName="py-20 sm:py-24"
+        >
           <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16 lg:items-start">
             <div id="about" className="scroll-mt-24 md:scroll-mt-28">
               <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl lg:max-w-[18ch]">
@@ -621,8 +659,13 @@ export default function App() {
             <div className="grid gap-10 sm:gap-12 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-10 xl:gap-12">
               <AboutSectionVisual palette={palette} />
               <div className="flex min-h-0 flex-col">
-                <ServicesGrouped />
-                <p className="mt-10 max-w-measure border-t border-stone-200 pt-10 text-base leading-relaxed text-stone-600">
+                <ServicesGrouped palette={palette} />
+                <p
+                  className={cn(
+                    "mt-10 max-w-measure border-t pt-10 text-base leading-relaxed text-stone-600",
+                    palette === "brand" ? "border-brass/35" : "border-stone-200",
+                  )}
+                >
                   Whether the need is broad visibility, stronger messaging, or a more coordinated marketing effort, the
                   work is shaped around what makes the most sense for the client.
                 </p>
@@ -632,7 +675,13 @@ export default function App() {
         </SectionShell>
 
         {/* Why */}
-        <SectionShell className="border-b border-stone-200 bg-parchment" innerClassName="py-20 sm:py-24">
+        <SectionShell
+          className={cn(
+            "border-b",
+            palette === "brand" ? "border-brass/40 bg-parchment" : "border-stone-200 bg-parchment",
+          )}
+          innerClassName="py-20 sm:py-24"
+        >
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-5">
               <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
@@ -640,7 +689,12 @@ export default function App() {
               </h2>
             </div>
             <div className="lg:col-span-7">
-              <div className="space-y-6 text-base leading-relaxed text-stone-600">
+              <div
+                className={cn(
+                  "space-y-6 text-base leading-relaxed",
+                  palette === "brand" ? "text-ink" : "text-stone-600",
+                )}
+              >
                 <p>
                   Grimm Marketing Group is a relationship-driven agency centered on direct communication, personalized
                   attention, and customized service.
@@ -652,15 +706,29 @@ export default function App() {
                   tailored.
                 </p>
               </div>
-              <ul className="mt-10 space-y-4 border-t border-stone-200 pt-10">
+              <ul
+                className={cn(
+                  "mt-10 space-y-4 border-t pt-10",
+                  palette === "brand" ? "border-brass/40" : "border-stone-200",
+                )}
+              >
                 {[
                   "Direct, one-on-one client relationship",
                   "Customized support based on your business and budget",
                   "Experience across traditional and digital media",
                   "A practical, personal approach to marketing",
                 ].map((line) => (
-                  <li key={line} className="flex gap-4 text-base text-stone-700">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 bg-heritage" aria-hidden />
+                  <li
+                    key={line}
+                    className={cn("flex gap-4 text-base", palette === "brand" ? "text-ink" : "text-stone-700")}
+                  >
+                    <span
+                      className={cn(
+                        "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                        palette === "brand" ? "bg-heritage-muted" : "bg-heritage",
+                      )}
+                      aria-hidden
+                    />
                     <span>{line}</span>
                   </li>
                 ))}
@@ -672,72 +740,76 @@ export default function App() {
         {/* Testimonial — rings reuse hero parallax (see mousemove + #testimonials bounds) */}
         <SectionShell
           id="testimonials"
-          className="relative overflow-hidden border-b border-stone-200 bg-stone-50"
+          className={cn(
+            "relative overflow-hidden border-b",
+            palette === "brand" ? "border-brass/40 bg-stone-50" : "border-stone-200 bg-stone-50",
+          )}
           innerClassName="py-20 sm:py-24"
         >
           <div
             className="pointer-events-none absolute -left-28 bottom-[-4rem] h-80 w-80 select-none sm:h-96 sm:w-96 lg:left-[-6%] lg:bottom-[-18%]"
             aria-hidden
           >
-            {palette === "brand" ? (
-              <>
-                <div
-                  className="absolute inset-0 rounded-full border border-lineStrong/82 will-change-transform"
-                  style={{
-                    transform: `translate3d(${ringOffset.x * 8}px, ${ringOffset.y * 6}px, 0)`,
-                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                  }}
-                />
-                <div
-                  className="absolute inset-[16.85%] rounded-full border border-lineStrong/74 will-change-transform"
-                  style={{
-                    transform: `translate3d(${ringOffset.x * 16}px, ${ringOffset.y * 11}px, 0)`,
-                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                  }}
-                />
-                <div
-                  className="absolute inset-[27.9%] rounded-full border border-lineStrong/66 will-change-transform"
-                  style={{
-                    transform: `translate3d(${ringOffset.x * 24}px, ${ringOffset.y * 16}px, 0)`,
-                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                <div
-                  className="absolute inset-0 rounded-full border border-heritage-muted/50 will-change-transform"
-                  style={{
-                    transform: `translate3d(${ringOffset.x * 8}px, ${ringOffset.y * 6}px, 0)`,
-                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                  }}
-                />
-                <div
-                  className="absolute inset-[16.85%] rounded-full border border-heritage/45 will-change-transform"
-                  style={{
-                    transform: `translate3d(${ringOffset.x * 16}px, ${ringOffset.y * 11}px, 0)`,
-                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                  }}
-                />
-                <div
-                  className="absolute inset-[27.9%] rounded-full border border-heritage-soft/40 will-change-transform"
-                  style={{
-                    transform: `translate3d(${ringOffset.x * 24}px, ${ringOffset.y * 16}px, 0)`,
-                    transition: reduceMotion.current ? undefined : "transform 50ms linear",
-                  }}
-                />
-              </>
-            )}
+            <>
+              {/* Lighter rings (same template as heritage); brand colors via CSS variables. */}
+              <div
+                className="absolute inset-0 rounded-full border border-heritage-muted/50 will-change-transform"
+                style={{
+                  transform: `translate3d(${ringOffset.x * 8}px, ${ringOffset.y * 6}px, 0)`,
+                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                }}
+              />
+              <div
+                className="absolute inset-[16.85%] rounded-full border border-heritage/45 will-change-transform"
+                style={{
+                  transform: `translate3d(${ringOffset.x * 16}px, ${ringOffset.y * 11}px, 0)`,
+                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                }}
+              />
+              <div
+                className="absolute inset-[27.9%] rounded-full border border-heritage-soft/40 will-change-transform"
+                style={{
+                  transform: `translate3d(${ringOffset.x * 24}px, ${ringOffset.y * 16}px, 0)`,
+                  transition: reduceMotion.current ? undefined : "transform 50ms linear",
+                }}
+              />
+            </>
           </div>
           <div className="relative">
             <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
               What Clients Have Said
             </h2>
-            <figure className="mt-12 max-w-3xl">
-              <blockquote className="font-display text-2xl font-medium leading-snug text-ink sm:text-3xl">
+            <figure
+              className={cn(
+                "mt-12 max-w-3xl",
+                palette === "brand" &&
+                  "relative rounded-sm border border-brass/50 bg-stone-100 p-8 pt-12 shadow-sm sm:p-10 sm:pt-14",
+              )}
+            >
+              {palette === "brand" && (
+                <span
+                  className="pointer-events-none absolute left-5 top-5 font-display text-5xl leading-none text-heritage-soft/50 sm:left-8 sm:top-6 sm:text-6xl"
+                  aria-hidden
+                >
+                  &ldquo;
+                </span>
+              )}
+              <blockquote
+                className={cn(
+                  "font-display text-2xl font-medium leading-snug text-ink sm:text-3xl",
+                  palette === "brand" && "relative z-[1]",
+                )}
+              >
                 {`"Hands down, the best advertising agency I have ever worked with. Grimm Marketing Group has without a doubt improved our bottom line and helped our business grow."`}
               </blockquote>
-              <figcaption className="mt-8 border-l-2 border-heritage pl-6 text-sm text-stone-600">
+              <figcaption
+                className={cn(
+                  "mt-8 pl-6 text-sm text-stone-600",
+                  palette === "brand"
+                    ? "border-l-4 border-heritage"
+                    : "border-l-2 border-heritage",
+                )}
+              >
                 <span className="font-semibold text-ink">Steve Vucovich</span>
                 <span className="mx-2 text-stone-400">·</span>
                 Owner, Apple Athletic Club
@@ -747,8 +819,28 @@ export default function App() {
         </SectionShell>
 
         {/* Podcast */}
-        <SectionShell className="border-b border-stone-200 bg-ink text-parchment" innerClassName="py-20 sm:py-24">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
+        <SectionShell
+          className={cn(
+            "relative overflow-hidden border-b bg-ink text-parchment",
+            palette === "brand" ? "border-brass/35" : "border-stone-200",
+          )}
+          innerClassName="relative overflow-hidden py-20 sm:py-24"
+        >
+          {palette === "brand" && (
+            <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.18]" aria-hidden>
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: [
+                    "repeating-linear-gradient(90deg, rgba(184,154,61,0.45) 0, rgba(184,154,61,0.45) 1px, transparent 1px, transparent 76px)",
+                    "repeating-linear-gradient(0deg, rgba(217,168,0,0.35) 0, rgba(217,168,0,0.35) 1px, transparent 1px, transparent 76px)",
+                    "repeating-linear-gradient(-35deg, transparent 0 38px, rgba(242,195,0,0.1) 38px 39px, transparent 39px 120px)",
+                  ].join(", "),
+                }}
+              />
+            </div>
+          )}
+          <div className="relative z-10 grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
             <div>
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
                 New Conversations. New Platforms. Same Commitment to Story.
@@ -756,7 +848,7 @@ export default function App() {
               <div
                 className={cn(
                   "mt-8 space-y-6 text-base leading-relaxed",
-                  palette === "brand" ? "text-parchment/85" : "text-stone-200",
+                  palette === "brand" ? "text-parchment/88" : "text-stone-200",
                 )}
               >
                 <p>
@@ -770,13 +862,20 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <div className="flex items-end border border-stone-600 bg-stone-800/40 p-8 sm:p-10">
+            <div
+              className={cn(
+                "flex items-end p-8 sm:p-10",
+                palette === "brand"
+                  ? "border border-brass/35 bg-charcoal/80"
+                  : "border border-stone-600 bg-stone-800/40",
+              )}
+            >
               <a
                 href={PODCAST_MAILTO}
                 className={cn(
                   "inline-flex w-full items-center justify-center border px-6 py-3 text-center text-sm font-semibold transition-colors",
                   palette === "brand"
-                    ? "border-heritage bg-heritage text-ink hover:brightness-110"
+                    ? "border-ink bg-heritage text-ink shadow-lg hover:brightness-95"
                     : "border-heritage bg-heritage text-ink hover:bg-heritage-soft hover:text-ink",
                 )}
               >
@@ -787,28 +886,70 @@ export default function App() {
         </SectionShell>
 
         {/* Contact */}
-        <SectionShell id="contact" className="bg-parchment" innerClassName="py-20 sm:py-24">
+        <SectionShell
+          id="contact"
+          className={cn("border-t", palette === "brand" ? "border-brass/30 bg-parchment" : "border-transparent bg-parchment")}
+          innerClassName="py-20 sm:py-24"
+        >
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
-              <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Let’s Talk</h2>
+              <p
+                className={cn(
+                  "font-mono text-[10px] uppercase tracking-[0.28em]",
+                  palette === "brand" ? "text-heritage-muted" : "text-stone-500",
+                )}
+              >
+                Contact
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                Let’s Talk
+              </h2>
               <p className="mt-6 max-w-measure text-base leading-relaxed text-stone-600">
                 If you are looking for personalized marketing support and a plan that fits your business, Grimm Marketing
                 Group would be glad to start the conversation.
               </p>
             </div>
             <div className="lg:col-span-7">
-              <div className="border border-stone-200 bg-panel p-8 sm:p-10">
+              <div
+                className={cn(
+                  "bg-panel p-8 sm:p-10",
+                  palette === "brand"
+                    ? "border-2 border-brass/70 shadow-[0_12px_40px_-12px_rgba(10,10,10,0.1)] ring-1 ring-brass/30"
+                    : "border border-stone-200",
+                )}
+              >
                 <dl className="space-y-5 text-base text-stone-700">
                   <div>
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-500">Name</dt>
+                    <dt
+                      className={cn(
+                        "font-mono text-[10px] uppercase tracking-[0.2em]",
+                        palette === "brand" ? "text-heritage-muted" : "text-stone-500",
+                      )}
+                    >
+                      Name
+                    </dt>
                     <dd className="mt-1 font-display text-xl text-ink">Patrick Grimm</dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-500">Phone</dt>
+                    <dt
+                      className={cn(
+                        "font-mono text-[10px] uppercase tracking-[0.2em]",
+                        palette === "brand" ? "text-heritage-muted" : "text-stone-500",
+                      )}
+                    >
+                      Phone
+                    </dt>
                     <dd className="mt-1 text-ink">208-XXX-XXXX</dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-500">Email</dt>
+                    <dt
+                      className={cn(
+                        "font-mono text-[10px] uppercase tracking-[0.2em]",
+                        palette === "brand" ? "text-heritage-muted" : "text-stone-500",
+                      )}
+                    >
+                      Email
+                    </dt>
                     <dd className="mt-1">
                       <a className="break-all hover:text-ink" href={`mailto:${EMAIL}`}>
                         patrick@xxxxxx.com
@@ -816,7 +957,14 @@ export default function App() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-500">Web</dt>
+                    <dt
+                      className={cn(
+                        "font-mono text-[10px] uppercase tracking-[0.2em]",
+                        palette === "brand" ? "text-heritage-muted" : "text-stone-500",
+                      )}
+                    >
+                      Web
+                    </dt>
                     <dd className="mt-1">
                       <a className="break-all hover:text-ink" href="https://www.xxxxxx.com">
                         www.xxxxxx.com
@@ -825,7 +973,7 @@ export default function App() {
                   </div>
                 </dl>
                 <div className="mt-10">
-                  <PrimaryButton href={CONTACT_MAILTO} className="w-full sm:w-auto">
+                  <PrimaryButton href={CONTACT_MAILTO} palette={palette} ctaVariant="nav" className="w-full sm:w-auto">
                     Send a Message
                   </PrimaryButton>
                 </div>
@@ -835,7 +983,12 @@ export default function App() {
         </SectionShell>
       </main>
 
-      <footer className="border-t border-stone-200 bg-stone-50">
+      <footer
+        className={cn(
+          "border-t",
+          palette === "brand" ? "border-brass/40 bg-ink text-parchment" : "border-stone-200 bg-stone-50",
+        )}
+      >
         <SectionShell as="footer" innerClassName="py-14 sm:py-16">
           <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-md">
@@ -852,22 +1005,49 @@ export default function App() {
                   decoding="async"
                 />
               </a>
-              <p className="mt-4 text-sm leading-relaxed text-stone-600">
+              <p
+                className={cn(
+                  "mt-4 text-sm leading-relaxed",
+                  palette === "brand" ? "text-parchment/75" : "text-stone-600",
+                )}
+              >
                 Personalized marketing support built around strategy, communication, and client relationships.
               </p>
             </div>
-            <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium text-stone-600" aria-label="Footer">
+            <nav
+              className={cn(
+                "flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium",
+                palette === "brand" ? "text-parchment/80" : "text-stone-600",
+              )}
+              aria-label="Footer"
+            >
               {NAV.map((item) => (
-                <a key={item.href} href={item.href} className="hover:text-ink">
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={palette === "brand" ? "transition-colors hover:text-heritage" : "hover:text-ink"}
+                >
                   {item.label}
                 </a>
               ))}
             </nav>
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-500">Social</p>
+              <p
+                className={cn(
+                  "font-mono text-[10px] uppercase tracking-[0.2em]",
+                  palette === "brand" ? "text-heritage-muted" : "text-stone-500",
+                )}
+              >
+                Social
+              </p>
               <div className="mt-3 flex items-center gap-2 sm:gap-3">
                 <a
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-sm text-ink transition-colors hover:text-heritage-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage"
+                  className={cn(
+                    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
+                    palette === "brand"
+                      ? "text-parchment hover:text-heritage"
+                      : "text-ink hover:text-heritage-muted",
+                  )}
                   href="https://x.com/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -876,7 +1056,12 @@ export default function App() {
                   <SocialLogoX className="h-5 w-5" />
                 </a>
                 <a
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-sm text-ink transition-colors hover:text-heritage-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage"
+                  className={cn(
+                    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
+                    palette === "brand"
+                      ? "text-parchment hover:text-heritage"
+                      : "text-ink hover:text-heritage-muted",
+                  )}
                   href="https://www.facebook.com/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -885,7 +1070,12 @@ export default function App() {
                   <SocialLogoFacebook className="h-5 w-5" />
                 </a>
                 <a
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-sm text-ink transition-colors hover:text-heritage-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage"
+                  className={cn(
+                    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
+                    palette === "brand"
+                      ? "text-parchment hover:text-heritage"
+                      : "text-ink hover:text-heritage-muted",
+                  )}
                   href="https://www.linkedin.com/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -896,11 +1086,21 @@ export default function App() {
               </div>
             </div>
           </div>
-          <div className="mt-10 border-t border-stone-200 pt-8">
+          <div
+            className={cn(
+              "mt-10 border-t pt-8",
+              palette === "brand" ? "border-brass/30" : "border-stone-200",
+            )}
+          >
             <button
               type="button"
               onClick={() => setPalette((p) => (p === "heritage" ? "brand" : "heritage"))}
-              className="text-left text-sm font-medium text-stone-600 underline decoration-stone-300 underline-offset-4 transition-colors hover:text-ink"
+              className={cn(
+                "text-left text-sm font-medium underline underline-offset-4 transition-colors",
+                palette === "brand"
+                  ? "text-parchment/70 decoration-brass/50 hover:text-heritage"
+                  : "text-stone-600 decoration-stone-300 hover:text-ink",
+              )}
               aria-label={
                 palette === "heritage"
                   ? "Switch to the original yellow and black brand colors"

@@ -4,7 +4,7 @@
 
 /**
  * Semantic Tailwind colors map to CSS variables.
- * `html[data-palette="brand"]` applies the yellow brand system (--bg-main, --bg-alt, etc.).
+ * `html[data-palette="brand"]` — bold Grimm yellow/black editorial (exact client palette).
  */
 @layer base {
   html {
@@ -31,38 +31,47 @@
     --color-line-rgb: 212 203 184;
     --color-line-strong-rgb: 201 162 39;
     --color-panel-rgb: 245 241 234;
+
+    --color-brass-rgb: 184 154 61;
+    --color-accent-rgb: 232 212 138;
+    --color-charcoal-rgb: 41 37 36;
   }
 
   /**
-   * Yellow brand system (re: --bg-main, --bg-alt, --bg-panel, --ink, --ink-soft,
-   * --brand-yellow, --brand-gold, --line, --line-strong).
-   */
-  /**
-   * Tokens: bg-main → parchment; bg-alt → stone-50; bg-panel → panel & stone-100;
-   * ink / ink-soft → ink & stone-600/700; brand-yellow → heritage; brand-gold → heritage-muted & stone-500 labels;
-   * line → stone-200; line-strong → stone-300 + motif rings.
+   * Bold theme — exact colors:
+   * Signal #F2C300 · Brand gold #D9A800 · Deep gold #B88200 · Ink #0A0A0A · Soft black #161616
+   * Warm cream #F5ECD8 · Pale sand #E9DDBF · Brass #B89A3D · Brown-black #2B2418
    */
   html[data-palette="brand"] {
-    --color-parchment-rgb: 245 241 232;
-    --color-ink-rgb: 23 23 23;
-    --color-heritage-rgb: 212 175 55;
-    --color-heritage-muted-rgb: 182 140 24;
-    --color-heritage-soft-rgb: 228 208 120;
+    --color-parchment-rgb: 245 236 216;
+    --color-ink-rgb: 10 10 10;
+    /* signal yellow */
+    --color-heritage-rgb: 242 195 0;
+    /* brand gold */
+    --color-heritage-muted-rgb: 217 168 0;
+    /* deep gold */
+    --color-heritage-soft-rgb: 184 130 0;
 
-    --color-stone-50-rgb: 237 230 216;
-    --color-stone-100-rgb: 248 244 236;
-    --color-stone-200-rgb: 216 205 175;
-    --color-stone-300-rgb: 191 174 114;
-    --color-stone-400-rgb: 150 140 118;
-    --color-stone-500-rgb: 182 140 24;
-    --color-stone-600-rgb: 43 43 43;
-    --color-stone-700-rgb: 35 35 35;
-    --color-stone-800-rgb: 41 37 36;
-    --color-stone-900-rgb: 28 25 23;
+    --color-stone-50-rgb: 233 221 191;
+    --color-stone-100-rgb: 247 242 228;
+    --color-stone-200-rgb: 184 154 61;
+    --color-stone-300-rgb: 184 154 61;
+    --color-stone-400-rgb: 67 58 42;
+    --color-stone-500-rgb: 217 168 0;
+    --color-stone-600-rgb: 43 36 24;
+    --color-stone-700-rgb: 43 36 24;
+    --color-stone-800-rgb: 22 22 22;
+    --color-stone-900-rgb: 10 10 10;
 
-    --color-line-rgb: 216 205 175;
-    --color-line-strong-rgb: 191 174 114;
-    --color-panel-rgb: 248 244 236;
+    --color-line-rgb: 184 154 61;
+    --color-line-strong-rgb: 217 168 0;
+    --color-panel-rgb: 247 242 228;
+
+    --color-brass-rgb: 184 154 61;
+    /* CTA / on-ink label text — signal yellow */
+    --color-accent-rgb: 242 195 0;
+    /* Services rail */
+    --color-charcoal-rgb: 22 22 22;
   }
 
   body {
