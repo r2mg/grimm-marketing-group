@@ -994,16 +994,33 @@ export default function App() {
             <div className="max-w-md">
               <a
                 href="#home"
+                aria-label={palette === "brand" ? "Grimm Marketing Group" : undefined}
                 className="inline-flex rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage"
               >
-                <img
-                  src="/gmg-logo-footer.png"
-                  alt="Grimm Marketing Group"
-                  width={280}
-                  height={52}
-                  className="h-9 w-auto max-w-[min(100%,18rem)] object-contain object-left sm:h-10 sm:max-w-none"
-                  decoding="async"
-                />
+                <span className="relative inline-block shrink-0">
+                  <img
+                    src="/gmg-logo-footer.png"
+                    alt={palette === "brand" ? "" : "Grimm Marketing Group"}
+                    width={280}
+                    height={52}
+                    className={cn(
+                      "block h-9 w-auto max-w-[min(100%,18rem)] object-contain object-left sm:h-10 sm:max-w-none",
+                      palette === "brand" && "opacity-0",
+                    )}
+                    decoding="async"
+                    aria-hidden={palette === "brand" ? true : undefined}
+                  />
+                  {palette === "brand" && (
+                    <span
+                      className={cn(
+                        "pointer-events-none absolute inset-0 bg-parchment",
+                        "[mask-image:url('/gmg-logo-footer.png')] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:left_center]",
+                        "[-webkit-mask-image:url('/gmg-logo-footer.png')] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:left_center]",
+                      )}
+                      aria-hidden
+                    />
+                  )}
+                </span>
               </a>
               <p
                 className={cn(
