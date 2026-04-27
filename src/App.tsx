@@ -1,12 +1,29 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
-const EMAIL = "patrick@xxxxxx.com";
+/** Replace with your live address, then set `CONTACT_EMAIL_CONFIGURED` to enable mailto on Contact + “Send a message”. */
+const CONTACT_EMAIL = "patrick@domain.com";
+/** After `CONTACT_EMAIL` is real (not the placeholder domain), set this to `true` so mailto links activate. */
+const CONTACT_EMAIL_CONFIGURED = false;
+
+const EMAIL = CONTACT_EMAIL;
+
 const PODCAST_MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent(
   "I would like to be a guest on the podcast.",
 )}`;
 const CONTACT_MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent(
   "I'd like to learn more about Grimm Marketing Group",
 )}`;
+
+const PHONE_DISPLAY = "(208) 761-4345";
+const PHONE_HREF = "tel:+12087614345";
+
+const SOCIAL_URLS = {
+  x: "https://x.com/grimm_marketing?s=21",
+  instagram:
+    "https://www.instagram.com/grimmmarketinggroup?igsh=MzFzbTZseWg0NHhw&utm_source=qr",
+  youtube: "https://youtube.com/@grimm_marketing?si=dTLhUjJLu6ejSdq-",
+  linkedin: "https://www.linkedin.com/in/patrick-grimm-ma-in-communications-and-media-studies-005b70297",
+} as const;
 
 const SERVICES: { code: string; label: string; band: "broadcast" | "digital" | "strategy" }[] = [
   { code: "01", label: "Television Placement", band: "broadcast" },
@@ -62,10 +79,18 @@ function SocialLogoX({ className }: { className?: string }) {
   );
 }
 
-function SocialLogoFacebook({ className }: { className?: string }) {
+function SocialLogoInstagram({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  );
+}
+
+function SocialLogoYouTube({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
     </svg>
   );
 }
@@ -75,6 +100,68 @@ function SocialLogoLinkedIn({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
+  );
+}
+
+/** X, Instagram, YouTube, LinkedIn — order matches Contact + footer. */
+function SocialProfileLinks({
+  palette,
+  variant,
+}: {
+  palette: PaletteMode;
+  /** Footer uses light icon color on dark bar in brand palette; Contact card uses ink in both palettes. */
+  variant: "footer" | "panel";
+}) {
+  const linkClass = cn(
+    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
+    variant === "footer"
+      ? palette === "brand"
+        ? "text-parchment hover:text-heritage"
+        : "text-ink hover:text-heritage-muted"
+      : palette === "brand"
+        ? "text-ink hover:text-heritage"
+        : "text-ink hover:text-heritage-muted",
+  );
+
+  return (
+    <>
+      <a
+        className={linkClass}
+        href={SOCIAL_URLS.x}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="X"
+      >
+        <SocialLogoX className="h-5 w-5" />
+      </a>
+      <a
+        className={linkClass}
+        href={SOCIAL_URLS.instagram}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram"
+      >
+        <SocialLogoInstagram className="h-5 w-5" />
+      </a>
+      <a
+        className={linkClass}
+        href={SOCIAL_URLS.youtube}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="YouTube"
+      >
+        <SocialLogoYouTube className="h-5 w-5" />
+      </a>
+      <a
+        className={linkClass}
+        href={SOCIAL_URLS.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="LinkedIn"
+      >
+        <SocialLogoLinkedIn className="h-5 w-5" />
+      </a>
+    </>
   );
 }
 
@@ -116,32 +203,43 @@ function SectionShell({
 
 function PrimaryButton({
   href,
+  disabled,
   children,
   className,
   palette = "heritage",
   ctaVariant = "nav",
 }: {
   href: string;
+  /** When true, renders a non-interactive control (e.g. mailto not yet enabled). */
+  disabled?: boolean;
   children: React.ReactNode;
   className?: string;
   palette?: PaletteMode;
   /** `hero`: signal yellow fill + ink text (bold theme). `nav`: ink fill + signal yellow text. */
   ctaVariant?: "nav" | "hero";
 }) {
+  const className_ = cn(
+    "inline-flex items-center justify-center border px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200",
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
+    palette === "brand"
+      ? ctaVariant === "nav"
+        ? "border-ink bg-ink text-accent hover:border-heritage hover:bg-heritage hover:text-ink"
+        : "border-ink bg-heritage text-ink hover:border-heritage-muted hover:bg-heritage-muted hover:text-ink"
+      : "border-ink bg-ink text-parchment hover:border-heritage hover:bg-heritage hover:text-ink",
+    disabled && "pointer-events-none cursor-not-allowed opacity-[0.55]",
+    className,
+  );
+
+  if (disabled) {
+    return (
+      <span className={className_} aria-disabled="true">
+        {children}
+      </span>
+    );
+  }
+
   return (
-    <a
-      href={href}
-      className={cn(
-        "inline-flex items-center justify-center border px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
-        palette === "brand"
-          ? ctaVariant === "nav"
-            ? "border-ink bg-ink text-accent hover:border-heritage hover:bg-heritage hover:text-ink"
-            : "border-ink bg-heritage text-ink hover:border-heritage-muted hover:bg-heritage-muted hover:text-ink"
-          : "border-ink bg-ink text-parchment hover:border-heritage hover:bg-heritage hover:text-ink",
-        className,
-      )}
-    >
+    <a href={href} className={className_}>
       {children}
     </a>
   );
@@ -939,7 +1037,14 @@ export default function App() {
                     >
                       Phone
                     </dt>
-                    <dd className="mt-1 text-ink">208-XXX-XXXX</dd>
+                    <dd className="mt-1">
+                      <a
+                        className="text-ink underline decoration-transparent underline-offset-2 transition-colors hover:decoration-stone-400"
+                        href={PHONE_HREF}
+                      >
+                        {PHONE_DISPLAY}
+                      </a>
+                    </dd>
                   </div>
                   <div>
                     <dt
@@ -950,12 +1055,29 @@ export default function App() {
                     >
                       Email
                     </dt>
-                    <dd className="mt-1">
-                      <a className="break-all hover:text-ink" href={`mailto:${EMAIL}`}>
-                        patrick@xxxxxx.com
-                      </a>
+                    <dd className="mt-1 break-all text-ink">
+                      {CONTACT_EMAIL_CONFIGURED ? (
+                        <a className="underline decoration-stone-300 underline-offset-2 transition-colors hover:decoration-ink" href={`mailto:${CONTACT_EMAIL}`}>
+                          {CONTACT_EMAIL}
+                        </a>
+                      ) : (
+                        CONTACT_EMAIL
+                      )}
                     </dd>
                   </div>
+                </dl>
+                <div className="mt-5">
+                  <PrimaryButton
+                    href={CONTACT_MAILTO}
+                    disabled={!CONTACT_EMAIL_CONFIGURED}
+                    palette={palette}
+                    ctaVariant="nav"
+                    className="w-full sm:w-auto"
+                  >
+                    Send a message
+                  </PrimaryButton>
+                </div>
+                <dl className="mt-5 space-y-5 text-base text-stone-700">
                   <div>
                     <dt
                       className={cn(
@@ -963,20 +1085,13 @@ export default function App() {
                         palette === "brand" ? "text-heritage-muted" : "text-stone-500",
                       )}
                     >
-                      Web
+                      Social
                     </dt>
-                    <dd className="mt-1">
-                      <a className="break-all hover:text-ink" href="https://www.xxxxxx.com">
-                        www.xxxxxx.com
-                      </a>
+                    <dd className="mt-2 flex flex-wrap items-center gap-2">
+                      <SocialProfileLinks palette={palette} variant="panel" />
                     </dd>
                   </div>
                 </dl>
-                <div className="mt-10">
-                  <PrimaryButton href={CONTACT_MAILTO} palette={palette} ctaVariant="nav" className="w-full sm:w-auto">
-                    Send a Message
-                  </PrimaryButton>
-                </div>
               </div>
             </div>
           </div>
@@ -1058,48 +1173,7 @@ export default function App() {
                 Social
               </p>
               <div className="mt-3 flex items-center gap-2 sm:gap-3">
-                <a
-                  className={cn(
-                    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
-                    palette === "brand"
-                      ? "text-parchment hover:text-heritage"
-                      : "text-ink hover:text-heritage-muted",
-                  )}
-                  href="https://x.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X"
-                >
-                  <SocialLogoX className="h-5 w-5" />
-                </a>
-                <a
-                  className={cn(
-                    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
-                    palette === "brand"
-                      ? "text-parchment hover:text-heritage"
-                      : "text-ink hover:text-heritage-muted",
-                  )}
-                  href="https://www.facebook.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                >
-                  <SocialLogoFacebook className="h-5 w-5" />
-                </a>
-                <a
-                  className={cn(
-                    "inline-flex h-10 w-10 items-center justify-center rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-heritage",
-                    palette === "brand"
-                      ? "text-parchment hover:text-heritage"
-                      : "text-ink hover:text-heritage-muted",
-                  )}
-                  href="https://www.linkedin.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                >
-                  <SocialLogoLinkedIn className="h-5 w-5" />
-                </a>
+                <SocialProfileLinks palette={palette} variant="footer" />
               </div>
             </div>
           </div>
