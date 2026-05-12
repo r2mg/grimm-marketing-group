@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
-/** Replace with your live address, then set `CONTACT_EMAIL_CONFIGURED` to enable mailto on Contact + “Send a message”. */
-const CONTACT_EMAIL = "patrick@domain.com";
-/** After `CONTACT_EMAIL` is real (not the placeholder domain), set this to `true` so mailto links activate. */
-const CONTACT_EMAIL_CONFIGURED = false;
+/** Set to `false` to hide mailto on the email line and disable “Send a message” until the address is final. */
+const CONTACT_EMAIL = "patrick@grimmmarketinggroup.com";
+const CONTACT_EMAIL_CONFIGURED = true;
 
 const EMAIL = CONTACT_EMAIL;
 
